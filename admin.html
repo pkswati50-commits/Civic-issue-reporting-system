@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Setu — Authority Dashboard</title>
+<link rel="stylesheet" href="style.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+</head>
+<body>
+
+<div class="admin-shell">
+  <aside class="admin-sidebar" id="adminSidebar">
+    <div class="brand" style="font-size:1.05rem; margin-bottom:1.4rem;">
+      <span class="mark"></span>
+      <span>Setu<small>Authority</small></span>
+    </div>
+    <div class="side-section">Workspace</div>
+    <a href="#" class="side-link active" data-view="ledger">📋 Issue Ledger</a>
+    <a href="#" class="side-link" data-view="map">🗺️ Map View</a>
+    <a href="#" class="side-link" data-view="sla">📊 SLA Reports</a>
+    <div class="side-section">Account</div>
+    <a href="index.html" class="side-link">↩ Citizen View</a>
+    <a href="#" class="side-link">⚙ Settings</a>
+  </aside>
+
+  <main class="admin-main">
+
+    <div class="admin-topbar">
+      <div style="display:flex;align-items:center;gap:.9rem;">
+        <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">☰</button>
+        <div>
+          <span class="eyebrow">BBMP · Ward 34</span>
+          <h1 style="font-size:1.25rem; margin-top:.15rem;" id="viewTitle">Issue Ledger</h1>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:1.2rem;">
+        <div class="topbar-badge">
+          <span class="badge-dot crit"></span>
+          <span id="criticalCount">0</span> critical
+        </div>
+        <div style="font-family:var(--font-mono); font-size:.78rem; color:var(--text-low);">
+          <span style="color:var(--text-hi);">field.officer@bbmp.gov.in</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="admin-kpi-strip" id="kpiRow"></div>
+
+
+    <div class="admin-content">
+
+  
+      <div id="view-ledger" class="admin-view active">
+        <div class="filter-bar">
+          <select id="statusFilter">
+            <option value="all">All statuses</option>
+            <option value="open">Open</option>
+            <option value="in_progress">In Progress</option>
+            <option value="resolved">Resolved</option>
+          </select>
+          <select id="severityFilter">
+            <option value="all">All severities</option>
+            <option value="critical">🔴 Critical</option>
+            <option value="high">🟠 High</option>
+            <option value="medium">🟡 Medium</option>
+            <option value="low">🟢 Low</option>
+          </select>
+          <select id="categoryFilter">
+            <option value="all">All categories</option>
+            <option value="manhole">⚠️ Open Manhole</option>
+            <option value="pothole">🕳️ Pothole</option>
+            <option value="electrical">⚡ Exposed Wiring</option>
+            <option value="streetlight">💡 Streetlight Out</option>
+            <option value="garbage">🗑️ Garbage Pileup</option>
+            <option value="water">💧 Water Leakage</option>
+            <option value="drainage">🌧️ Blocked Drain</option>
+            <option value="signage">🚧 Damaged Signage</option>
+            <option value="treefall">🌳 Fallen Tree</option>
+            <option value="other">📌 Other</option>
+          </select>
+          <input type="text" id="searchInput" placeholder="Search by ID or area…" />
+        </div>
+
+        <div class="panel ledger-panel">
+          <table class="ledger">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Issue</th>
+                <th>Severity</th>
+                <th>Impact</th>
+                <th>SLA</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="ledgerBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div id="view-map" class="admin-view">
+        <div class="map-toolbar">
+          <span class="eyebrow" style="align-self:center;">Live issue map</span>
+          <div class="map-legend">
+            <span class="leg-item"><span class="leg-dot" style="background:var(--sev-critical)"></span>Critical</span>
+            <span class="leg-item"><span class="leg-dot" style="background:var(--sev-high)"></span>High</span>
+            <span class="leg-item"><span class="leg-dot" style="background:var(--sev-medium)"></span>Medium</span>
+            <span class="leg-item"><span class="leg-dot" style="background:var(--sev-low)"></span>Low</span>
+          </div>
+        </div>
+        <div class="panel" style="overflow:hidden;">
+          <div id="adminMap" class="map-box map-admin"></div>
+        </div>
+        <div class="map-issue-list" id="mapIssueList"></div>
+      </div>
+      <div id="view-sla" class="admin-view">
+        <div class="sla-grid" id="slaGrid"></div>
+      </div>
+
+    </div>
+  </main>
+</div>
+<div class="modal-backdrop" id="resolveModalBackdrop">
+  <div class="panel panel-pad modal">
+    <div class="modal-head">
+      <div>
+        <span class="eyebrow">Resolve issue</span>
+        <h3 id="modalIssueId" style="margin-top:.3rem;"></h3>
+      </div>
+      <button class="close-x" id="closeModalBtn" aria-label="Close">✕</button>
+    </div>
+    <p class="muted" style="font-size:.85rem; margin-top:0;">
+      An after photo is required to mark this resolved — this is what citizens see to confirm the fix.
+    </p>
+    <div class="field">
+      <label>Resolution proof <span class="hint">After photo required</span></label>
+      <div class="upload-pair">
+        <div class="dropzone">
+          <input type="file" id="beforePhotoInput" accept="image/*" capture="environment" />
+          <div class="dz-icon">🖼️</div>
+          <div class="dz-title">Before (optional)</div>
+        </div>
+        <div class="dropzone">
+          <input type="file" id="afterPhotoInput" accept="image/*" capture="environment" />
+          <div class="dz-icon">✅</div>
+          <div class="dz-title">After (required)</div>
+        </div>
+      </div>
+      <div style="display:flex; gap:.6rem; margin-top:.6rem;">
+        <div id="beforePreview" style="flex:1;"></div>
+        <div id="afterPreview" style="flex:1;"></div>
+      </div>
+    </div>
+    <div class="field">
+      <label for="resolveNote">Resolution note <span class="hint">Optional</span></label>
+      <textarea id="resolveNote" placeholder="e.g. Manhole cover replaced, area barricaded during work"></textarea>
+    </div>
+    <button class="btn btn-teal btn-block" id="confirmResolveBtn" disabled>Confirm resolved</button>
+  </div>
+</div>
+
+<div class="toast" id="adminToast"></div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="js/shared.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>

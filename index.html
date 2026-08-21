@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Setu — Report a Civic Issue</title>
+<meta name="description" content="Report civic issues near you and track resolution in real time." />
+<link rel="stylesheet" href="style.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a href="index.html" class="brand" style="text-decoration:none;">
+      <span class="mark"></span>
+      <span>Setu<small>Civic Issue Reporting</small></span>
+    </a>
+    <nav class="nav-links" id="navLinks">
+      <a href="index.html" class="current">Report</a>
+      <a href="index.html#nearby">Nearby Issues</a>
+      <a href="admin.html">Authority Login</a>
+    </nav>
+    <div class="header-right">
+      <div class="lang-picker">
+        <button class="lang-btn" id="langBtn" aria-haspopup="true" aria-expanded="false">
+          <span id="langFlag">🇮🇳</span>
+          <span id="langName">EN</span>
+          <svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </button>
+        <div class="lang-dropdown" id="langDropdown" role="menu">
+          <button class="lang-option active" data-lang="en-IN" data-flag="🇮🇳" data-name="EN">English</button>
+          <button class="lang-option" data-lang="kn-IN" data-flag="🌐" data-name="ಕನ್ನಡ">ಕನ್ನಡ</button>
+          <button class="lang-option" data-lang="hi-IN" data-flag="🌐" data-name="हिंदी">हिंदी</button>
+          <button class="lang-option" data-lang="ta-IN" data-flag="🌐" data-name="தமிழ்">தமிழ்</button>
+          <button class="lang-option" data-lang="te-IN" data-flag="🌐" data-name="తెలుగు">తెలుగు</button>
+          <button class="lang-option" data-lang="ml-IN" data-flag="🌐" data-name="മലയാളം">മലയാളം</button>
+          <button class="lang-option" data-lang="mr-IN" data-flag="🌐" data-name="मराठी">मराठी</button>
+          <button class="lang-option" data-lang="gu-IN" data-flag="🌐" data-name="ગુજરાતી">ગુજરાતી</button>
+          <button class="lang-option" data-lang="bn-IN" data-flag="🌐" data-name="বাংলা">বাংলা</button>
+        </div>
+      </div>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false">
+        <span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <span class="eyebrow">Crowdsourced &amp; citizen-verified</span>
+      <h1>Report it. Track it.<br />Confirm it's actually fixed.</h1>
+      <p class="lead">Every report is geo-clustered with nearby duplicates, ranked by urgency, and stays open until the citizens who reported it confirm the fix — not just the authority.</p>
+      <div class="hero-actions">
+        <a href="#reportForm" class="btn btn-gold">Report an issue</a>
+        <a href="#nearby" class="btn btn-outline">See nearby reports</a>
+      </div>
+      <div class="stat-strip">
+        <div class="stat"><span class="num" data-count="1284">0</span><span class="lbl">Reports filed</span></div>
+        <div class="stat"><span class="num" data-count="912">0</span><span class="lbl">Resolved</span></div>
+        <div class="stat"><span class="num" data-count="41">0</span><span class="lbl">Avg. hours to fix</span></div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="sev-pill critical" style="margin-bottom:1rem;"><span class="dot"></span>Critical · open manhole</div>
+      <div style="display:flex; align-items:center; gap:1rem;">
+        <div class="sla-ring" style="--ring-size:72px; --ring-pct:0.18; --ring-color:var(--sev-critical);">
+          <span class="sla-label"><b>2h</b>left</span>
+        </div>
+        <div>
+          <strong style="font-family:var(--font-display); font-size:1.1rem;">Jayanagar 4th Block</strong>
+          <div class="muted" style="font-size:.85rem; margin-top:.2rem;">✓ 18 citizens confirmed nearby</div>
+        </div>
+      </div>
+      <hr style="border:none;border-top:1px solid var(--border); margin:1.2rem 0;" />
+      <p class="muted" style="font-size:.85rem; margin:0;">The ring depletes as the SLA deadline approaches — colour-coded so authorities can triage at a glance.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="reportForm">
+  <div class="wrap">
+    <div class="panel panel-pad" style="max-width:760px; margin-inline:auto;">
+      <span class="eyebrow">New report</span>
+      <h2 id="formTitle" style="margin-top:.5rem; font-size:1.6rem;">What's the issue?</h2>
+
+      <!-- Voice report panel -->
+      <div class="voice-panel">
+        <div class="voice-panel-top">
+          <div>
+            <div class="voice-panel-label" id="voicePanelLabel">🎤 Speak your report</div>
+            <div class="voice-panel-sub" id="voicePanelSub">Tap the mic and describe the issue in your language</div>
+          </div>
+          <button type="button" class="mic-btn" id="micBtn" aria-label="Start voice input">
+            <span class="mic-icon">🎙️</span>
+            <span class="mic-ripple"></span>
+          </button>
+        </div>
+        <div class="voice-transcript" id="voiceTranscript" style="display:none;">
+          <div id="transcriptText"></div>
+          <div class="transcript-actions" id="transcriptActions" style="display:none;">
+            <button type="button" class="btn btn-teal btn-sm" id="applyTranscriptBtn">✓ Apply to form</button>
+            <button type="button" class="btn-ghost btn-sm" id="retryVoiceBtn">↺ Retry</button>
+          </div>
+        </div>
+      </div>
+
+      <form id="reportForm" style="margin-top:1.6rem;">
+
+        <div class="field">
+          <label>Category <span class="hint">Pick the closest match</span></label>
+          <div class="category-grid" id="categoryGrid"></div>
+        </div>
+
+        <div class="field">
+          <label>Severity <span class="hint" id="aiHint"></span></label>
+          <div class="severity-readout">
+            <span class="sev-pill" id="severityPill"><span class="dot"></span> Select a category</span>
+            <p class="copy" id="severityCopy"></p>
+          </div>
+          <div class="sev-override" id="sevOverride" style="display:none;">
+            <span class="hint" style="margin-bottom:.4rem;display:block;">Override severity <span style="color:var(--text-low);">(optional)</span></span>
+            <div class="sev-override-chips" id="sevOverrideChips">
+              <button type="button" class="sev-chip active" data-sev="auto">Auto</button>
+              <button type="button" class="sev-chip low" data-sev="low">🟢 Low</button>
+              <button type="button" class="sev-chip medium" data-sev="medium">🟡 Medium</button>
+              <button type="button" class="sev-chip high" data-sev="high">🟠 High</button>
+              <button type="button" class="sev-chip critical" data-sev="critical">🔴 Critical</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Photo evidence <span class="hint">Up to 6 photos</span></label>
+          <div class="dropzone" id="dropzone">
+            <input type="file" id="photoInput" accept="image/*" multiple capture="environment" />
+            <div class="dz-icon">📷</div>
+            <div class="dz-title">Drop photos here or tap to capture</div>
+            <div class="dz-sub">JPEG or PNG · AI will suggest a category from your first photo</div>
+          </div>
+          <div class="preview-grid" id="previewGrid"></div>
+        </div>
+
+        <div class="field">
+          <label>Location</label>
+          <div class="loc-row">
+            <button type="button" class="btn btn-outline btn-sm" id="locateBtn">📍 Use my location</button>
+            <span class="loc-status" id="locStatus"><span class="pulse"></span> Not located yet</span>
+          </div>
+          <div id="reportMapWrap" class="map-wrap" style="display:none;">
+            <div id="reportMap" class="map-box"></div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="addressInput">Address / landmark <span class="hint">Optional if located above</span></label>
+          <input type="text" id="addressInput" placeholder="e.g. Near 4th block bus stop, Jayanagar" />
+        </div>
+
+        <div class="field">
+          <label for="descInput">Description</label>
+          <textarea id="descInput" placeholder="Briefly describe what you're seeing…"></textarea>
+        </div>
+
+        <div class="form-row">
+          <div class="field">
+            <label for="nameInput">Your name</label>
+            <input type="text" id="nameInput" placeholder="Optional" />
+          </div>
+          <div class="field">
+            <label for="phoneInput">Phone</label>
+            <input type="tel" id="phoneInput" placeholder="For status updates" />
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-gold btn-block">Submit report</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="nearby">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Live &amp; nearby</span>
+      <h2>Reports around you</h2>
+      <p class="muted">Confirm a report if you've seen the same issue — it raises severity and keeps it accurate.</p>
+    </div>
+    <div class="panel" style="margin-bottom:1.5rem; overflow:hidden;">
+      <div id="nearbyMap" class="map-box map-tall"></div>
+    </div>
+    <div class="report-grid" id="reportGrid"></div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span>Setu — Crowdsourced Civic Issue Reporting &amp; Resolution</span>
+    <span>Built for Smart India Hackathon</span>
+  </div>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="js/shared.js"></script>
+<script src="js/report.js"></script>
+</body>
+</html>
