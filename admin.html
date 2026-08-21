@@ -20,7 +20,7 @@
 
 <header class="bg-slate-800 text-white px-6 py-4 flex items-center justify-between shadow">
   <div>
-    <h1 class="text-xl font-bold">🏛️ CivicFix — Authority Dashboard</h1>
+    <h1 class="text-xl font-bold">CivicFix — Authority Dashboard</h1>
     <p class="text-slate-300 text-sm">Prioritize → Assign → Work → Resolve → Learn</p>
   </div>
   <a href="/" class="bg-white text-slate-800 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-slate-100">← Citizen View</a>
@@ -33,11 +33,11 @@
 
   <div class="grid md:grid-cols-2 gap-6">
     <section class="bg-white rounded-xl shadow p-4">
-      <h2 class="text-lg font-bold mb-3">🗺️ Issue Map</h2>
+      <h2 class="text-lg font-bold mb-3"> Issue Map</h2>
       <div id="map"></div>
     </section>
     <section class="bg-white rounded-xl shadow p-4">
-      <h2 class="text-lg font-bold mb-3">📊 Issues by Category</h2>
+      <h2 class="text-lg font-bold mb-3">Issues by Category</h2>
       <canvas id="categoryChart" height="160"></canvas>
     </section>
   </div>
@@ -45,7 +45,7 @@
   <!-- Priority Queue -->
   <section class="bg-white rounded-xl shadow p-4">
     <div class="flex items-center justify-between mb-3">
-      <h2 class="text-lg font-bold">🔥 Priority Queue</h2>
+      <h2 class="text-lg font-bold"> Priority Queue</h2>
       <div class="flex gap-2">
         <select id="filterStatus" class="border rounded-lg px-2 py-1 text-sm" onchange="loadIssues()">
           <option value="">All statuses</option>
@@ -61,7 +61,7 @@
 
   <!-- Recurring hotspots -->
   <section class="bg-white rounded-xl shadow p-4">
-    <h2 class="text-lg font-bold mb-3">🔁 Recurring Hotspots (Learn)</h2>
+    <h2 class="text-lg font-bold mb-3"> Recurring Hotspots (Learn)</h2>
     <div id="hotspots" class="text-sm text-slate-500">Loading...</div>
   </section>
 
@@ -148,7 +148,7 @@ async function loadIssues() {
           ${i.reopened_count > 0 ? `<span class="text-xs px-2 py-0.5 rounded-full bg-red-100 text-red-700">Reopened ${i.reopened_count}x</span>` : ''}
         </div>
         <p class="text-sm text-slate-500">${i.description}</p>
-        <p class="text-xs text-slate-400">📍 ${i.lat.toFixed(4)}, ${i.lng.toFixed(4)} • 🏢 ${i.department} • 👍 ${i.upvotes} confirmations • Priority score: <b>${i.priority_score}</b></p>
+        <p class="text-xs text-slate-400"> ${i.lat.toFixed(4)}, ${i.lng.toFixed(4)} •  ${i.department} •  ${i.upvotes} confirmations • Priority score: <b>${i.priority_score}</b></p>
       </div>
       <div class="flex gap-1">
         <button onclick="setStatus('${i.id}','acknowledged')" class="bg-amber-500 text-white text-xs px-2 py-1 rounded">Acknowledge</button>
