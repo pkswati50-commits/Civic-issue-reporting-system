@@ -19,7 +19,7 @@
 
 <header class="bg-emerald-700 text-white px-6 py-4 flex items-center justify-between shadow">
   <div>
-    <h1 class="text-xl font-bold">🏙️ CivicFix</h1>
+    <h1 class="text-xl font-bold"> CivicFix</h1>
     <p class="text-emerald-100 text-sm">Report → Verify → Prioritize → Assign → Work → Resolve → Verify → Learn</p>
   </div>
   <a href="/admin" class="bg-white text-emerald-700 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-emerald-50">Authority Dashboard →</a>
@@ -29,7 +29,7 @@
 
   <!-- Report Form -->
   <section class="bg-white rounded-xl shadow p-6">
-    <h2 class="text-lg font-bold mb-4">📍 Report a Civic Issue</h2>
+    <h2 class="text-lg font-bold mb-4"> Report a Civic Issue</h2>
     <form id="reportForm" class="space-y-4">
       <div>
         <label class="text-sm font-semibold">Category</label>
@@ -58,7 +58,7 @@
       <div>
         <label class="text-sm font-semibold">Location</label>
         <button type="button" id="getLocationBtn" class="w-full border-2 border-dashed border-emerald-400 rounded-lg p-2 mt-1 text-emerald-700 font-semibold hover:bg-emerald-50">
-          📍 Use My Current Location
+           Use My Current Location
         </button>
         <p id="locationStatus" class="text-xs text-slate-500 mt-1"></p>
       </div>
@@ -72,12 +72,12 @@
   <!-- Map + My Reports -->
   <section class="space-y-6">
     <div class="bg-white rounded-xl shadow p-4">
-      <h2 class="text-lg font-bold mb-3">🗺️ Live Issue Map</h2>
+      <h2 class="text-lg font-bold mb-3"> Live Issue Map</h2>
       <div id="map"></div>
     </div>
 
     <div class="bg-white rounded-xl shadow p-4">
-      <h2 class="text-lg font-bold mb-3">📋 My Reports</h2>
+      <h2 class="text-lg font-bold mb-3"> My Reports</h2>
       <div id="myReports" class="space-y-2 text-sm text-slate-500">No reports yet.</div>
     </div>
   </section>
@@ -105,10 +105,10 @@ document.getElementById('getLocationBtn').onclick = () => {
     (pos) => {
       selectedLat = pos.coords.latitude;
       selectedLng = pos.coords.longitude;
-      statusEl.textContent = `✅ Location captured: ${selectedLat.toFixed(5)}, ${selectedLng.toFixed(5)}`;
+      statusEl.textContent = ` Location captured: ${selectedLat.toFixed(5)}, ${selectedLng.toFixed(5)}`;
       map.setView([selectedLat, selectedLng], 16);
     },
-    (err) => { statusEl.textContent = '❌ Could not get location: ' + err.message; },
+    (err) => { statusEl.textContent = ' Could not get location: ' + err.message; },
     { enableHighAccuracy: true }
   );
 };
@@ -124,7 +124,7 @@ document.getElementById('photo').onchange = (e) => {
     preview.classList.remove('hidden');
 
     const suggestionEl = document.getElementById('aiSuggestion');
-    suggestionEl.textContent = '🤖 Analyzing photo...';
+    suggestionEl.textContent = ' Analyzing photo...';
     suggestionEl.className = 'text-xs mt-2 text-slate-400';
     suggestionEl.classList.remove('hidden');
 
@@ -137,15 +137,15 @@ document.getElementById('photo').onchange = (e) => {
       const data = await res.json();
       if (data.ai_available) {
         document.getElementById('category').value = data.category;
-        const severityStars = '⚠️'.repeat(Math.min(data.severity || 1, 5));
-        suggestionEl.innerHTML = `🤖 AI detected: <b>${data.category.replace('_',' ')}</b> ${severityStars}<br><span class="text-slate-500">${data.description || ''}</span>`;
+        const severityStars = .repeat(Math.min(data.severity || 1, 5));
+        suggestionEl.innerHTML = ` AI detected: <b>${data.category.replace('_',' ')}</b> ${severityStars}<br><span class="text-slate-500">${data.description || ''}</span>`;
         suggestionEl.className = 'text-xs mt-2 text-emerald-700';
       } else {
-        suggestionEl.textContent = 'ℹ️ ' + (data.message || 'AI unavailable — pick category manually.');
+        suggestionEl.textContent =  (data.message || 'AI unavailable — pick category manually.');
         suggestionEl.className = 'text-xs mt-2 text-slate-400';
       }
     } catch (err) {
-      suggestionEl.textContent = 'ℹ️ AI check skipped — pick category manually.';
+      suggestionEl.textContent = ' AI check skipped — pick category manually.';
       suggestionEl.className = 'text-xs mt-2 text-slate-400';
     }
   };
@@ -156,7 +156,7 @@ document.getElementById('reportForm').onsubmit = async (e) => {
   e.preventDefault();
   const resultEl = document.getElementById('submitResult');
   if (selectedLat === null) {
-    resultEl.textContent = '⚠️ Please capture your location first.';
+    resultEl.textContent = 'Please capture your location first.';
     resultEl.className = 'text-sm mt-2 text-red-600';
     return;
   }
@@ -178,10 +178,10 @@ document.getElementById('reportForm').onsubmit = async (e) => {
     });
     const data = await res.json();
     if (data.merged_into_existing) {
-      resultEl.textContent = `🔁 ${data.message} (Now ${data.issue.upvotes} people confirmed this issue.)`;
+      resultEl.textContent = ` ${data.message} (Now ${data.issue.upvotes} people confirmed this issue.)`;
       resultEl.className = 'text-sm mt-2 text-amber-700 font-semibold';
     } else {
-      resultEl.textContent = `✅ ${data.message} Assigned to ${data.issue.department}.`;
+      resultEl.textContent = ` ${data.message} Assigned to ${data.issue.department}.`;
       resultEl.className = 'text-sm mt-2 text-emerald-700 font-semibold';
     }
     document.getElementById('reportForm').reset();
@@ -190,7 +190,7 @@ document.getElementById('reportForm').onsubmit = async (e) => {
     document.getElementById('locationStatus').textContent = '';
     loadIssues();
   } catch (err) {
-    resultEl.textContent = '❌ Failed to submit: ' + err.message;
+    resultEl.textContent = ' Failed to submit: ' + err.message;
     resultEl.className = 'text-sm mt-2 text-red-600';
   }
 };
